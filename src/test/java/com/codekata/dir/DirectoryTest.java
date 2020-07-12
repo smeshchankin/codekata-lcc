@@ -10,7 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class DirectoryTest {
     private Directory dir;
@@ -36,36 +37,24 @@ class DirectoryTest {
         Path path = Paths.get(String.join("/", paths));
         dir.addPath(path);
 
-        FSNode curr = dir.getRoot();
-        for (String expected : paths) {
-            assertNotNull(curr, "Path can't be null");
-            String actual = curr.getName();
-            assertEquals(expected, actual, "Checking directory name");
-            if (curr.getChildren() == null || curr.getChildren().size() != 1) {
-                curr = null;
-            } else {
-                curr = curr.getChildren().get(0);
-            }
-        }
+        FSNode root = dir.getRoot();
+        testFSNode(root, "file.txt", 0);
     }
 
     @Test
     void testAddOnePath() {
-        List<String> paths = Arrays.asList("folder1", "folder2", "file.txt");
+        List<String> paths = Arrays.asList("root", "folder", "file.txt");
         Path path = Paths.get(String.join("/", paths));
         dir.addPath(path);
 
         FSNode curr = dir.getRoot();
-        for (String expected : paths) {
-            assertNotNull(curr, "Path can't be null");
-            String actual = curr.getName();
-            assertEquals(expected, actual, "Checking directory name");
-            if (curr.getChildren() == null || curr.getChildren().size() != 1) {
-                curr = null;
-            } else {
-                curr = curr.getChildren().get(0);
-            }
-        }
+        testFSNode(curr, "root", 1);
+
+        curr = curr.getChildren().get(0);
+        testFSNode(curr, "folder", 1);
+
+        curr = curr.getChildren().get(0);
+        testFSNode(curr, "file.txt", 0);
     }
 
     @Test
@@ -79,16 +68,9 @@ class DirectoryTest {
             .forEach(dir::addPath);
 
         FSNode root = dir.getRoot();
-        assertEquals("root", root.getName(), "Root folder has root name");
-        assertEquals(2, root.getChildren().size(), "Root folder has 2 children");
-
-        FSNode curr = root.getChildren().get(0);
-        assertEquals("file_1.txt", curr.getName(), "File name testing");
-        assertEquals(0, curr.getChildren().size(), "Node has " + 0 + " children");
-
-        curr = root.getChildren().get(1);
-        assertEquals("file_2.txt", curr.getName(), "File name testing");
-        assertEquals(0, curr.getChildren().size(), "Node has " + 0 + " children");
+        testFSNode(root, "root", 2);
+        testFSNode(root.getChildren().get(0), "file_1.txt", 0);
+        testFSNode(root.getChildren().get(1), "file_2.txt", 0);
     }
 
     @Test
@@ -101,24 +83,21 @@ class DirectoryTest {
             .map(Paths::get)
             .forEach(dir::addPath);
 
-        FSNode root = dir.getRoot();
-        assertEquals("root", root.getName(), "Root folder has root name");
-        assertEquals(1, root.getChildren().size(), "Root folder has 1 children");
-
-        FSNode curr = root.getChildren().get(0);
-        assertEquals("folder", curr.getName(), "File name testing");
-        assertEquals(1, curr.getChildren().size(), "Node has " + 1 + " children");
+        FSNode curr = dir.getRoot();
+        testFSNode(curr, "root", 1);
 
         curr = curr.getChildren().get(0);
-        assertEquals("sub-folder", curr.getName(), "File name testing");
-        assertEquals(2, curr.getChildren().size(), "Node has " + 2 + " children");
+        testFSNode(curr, "folder", 1);
 
-        FSNode file = curr.getChildren().get(0);
-        assertEquals("file_1.txt", file.getName(), "File name testing");
-        assertEquals(0, file.getChildren().size(), "Node has " + 0 + " children");
+        curr = curr.getChildren().get(0);
+        testFSNode(curr, "sub-folder", 2);
 
-        file = curr.getChildren().get(1);
-        assertEquals("file_2.txt", file.getName(), "File name testing");
-        assertEquals(0, file.getChildren().size(), "Node has " + 0 + " children");
+        testFSNode(curr.getChildren().get(0), "file_1.txt", 0);
+        testFSNode(curr.getChildren().get(1), "file_2.txt", 0);
+    }
+
+    private void testFSNode(FSNode node, String name, int childrenSize) {
+        assertEquals(name, node.getName(), "File name testing");
+        assertEquals(childrenSize, node.getChildren().size(), "Node has " + childrenSize + " children");
     }
 }
