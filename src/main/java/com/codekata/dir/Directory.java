@@ -3,6 +3,11 @@ package com.codekata.dir;
 import java.nio.file.Path;
 import java.util.Objects;
 
+/**
+ * Usage: create instance and execute addPath several times
+ * Limitations:
+ *    * root folder should be the same
+ */
 public class Directory {
     private FSNode root = null;
 
