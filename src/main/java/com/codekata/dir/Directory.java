@@ -1,6 +1,7 @@
 package com.codekata.dir;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
@@ -22,7 +23,7 @@ public class Directory {
             }
 
             if (root == null) {
-                curr = root = new FSNode(name);
+                curr = root = new FSNode(Paths.get(name), name);
             } else if (ind == 0) {
                 if (!Objects.equals(curr.getName(), name)) {
                     throw new IllegalArgumentException("First folder in path should be the same");

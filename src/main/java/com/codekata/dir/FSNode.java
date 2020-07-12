@@ -12,7 +12,8 @@ public class FSNode {
     private long lines;
     private List<FSNode> children = new ArrayList<>();
 
-    public FSNode(String name) {
+    public FSNode(Path path, String name) {
+        this.path = path;
         this.name = name;
     }
 
@@ -23,7 +24,7 @@ public class FSNode {
         if (node.isPresent()) {
             return node.get();
         } else {
-            FSNode fsNode = new FSNode(name);
+            FSNode fsNode = new FSNode(path.resolve(name), name);
             children.add(fsNode);
             return fsNode;
         }
