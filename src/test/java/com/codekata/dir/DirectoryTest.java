@@ -70,20 +70,55 @@ class DirectoryTest {
 
     @Test
     public void testOneFolderTwoFiles() {
-        Stream<List<String>> stream = Stream.of(Arrays.asList("root", "file_1.txt"), Arrays.asList("root", "file_2.txt"));
-        stream
-            .map(list -> String.join("/", list))
+        Stream<List<String>> stream = Stream.of(
+            Arrays.asList("root", "file_1.txt"),
+            Arrays.asList("root", "file_2.txt"));
+
+        stream.map(list -> String.join("/", list))
             .map(Paths::get)
             .forEach(dir::addPath);
 
         FSNode root = dir.getRoot();
         assertEquals("root", root.getName(), "Root folder has root name");
         assertEquals(2, root.getChildren().size(), "Root folder has 2 children");
+
         FSNode curr = root.getChildren().get(0);
         assertEquals("file_1.txt", curr.getName(), "File name testing");
         assertEquals(0, curr.getChildren().size(), "Node has " + 0 + " children");
+
         curr = root.getChildren().get(1);
         assertEquals("file_2.txt", curr.getName(), "File name testing");
         assertEquals(0, curr.getChildren().size(), "Node has " + 0 + " children");
+    }
+
+    @Test
+    public void testSamePathsWithTwoFiles() {
+        Stream<List<String>> stream = Stream.of(
+            Arrays.asList("root", "folder", "sub-folder", "file_1.txt"),
+            Arrays.asList("root", "folder", "sub-folder", "file_2.txt"));
+
+        stream.map(list -> String.join("/", list))
+            .map(Paths::get)
+            .forEach(dir::addPath);
+
+        FSNode root = dir.getRoot();
+        assertEquals("root", root.getName(), "Root folder has root name");
+        assertEquals(1, root.getChildren().size(), "Root folder has 1 children");
+
+        FSNode curr = root.getChildren().get(0);
+        assertEquals("folder", curr.getName(), "File name testing");
+        assertEquals(1, curr.getChildren().size(), "Node has " + 1 + " children");
+
+        curr = curr.getChildren().get(0);
+        assertEquals("sub-folder", curr.getName(), "File name testing");
+        assertEquals(2, curr.getChildren().size(), "Node has " + 2 + " children");
+
+        FSNode file = curr.getChildren().get(0);
+        assertEquals("file_1.txt", file.getName(), "File name testing");
+        assertEquals(0, file.getChildren().size(), "Node has " + 0 + " children");
+
+        file = curr.getChildren().get(1);
+        assertEquals("file_2.txt", file.getName(), "File name testing");
+        assertEquals(0, file.getChildren().size(), "Node has " + 0 + " children");
     }
 }

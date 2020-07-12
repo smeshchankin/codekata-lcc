@@ -3,6 +3,8 @@ package com.codekata.dir;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class FSNode {
     private Path path;
@@ -15,9 +17,16 @@ public class FSNode {
     }
 
     public FSNode addChild(String name) {
-        FSNode node = new FSNode(name);
-        children.add(node);
-        return node;
+        Optional<FSNode> node = children.stream()
+            .filter(n -> Objects.equals(n.name, name))
+            .findFirst();
+        if (node.isPresent()) {
+            return node.get();
+        } else {
+            FSNode fsNode = new FSNode(name);
+            children.add(fsNode);
+            return fsNode;
+        }
     }
 
     public String getName() {
