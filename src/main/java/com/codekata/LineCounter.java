@@ -3,7 +3,7 @@ package com.codekata;
 import java.util.stream.Stream;
 
 public class LineCounter {
-    private Stream<String> lines;
+    private final Stream<String> lines;
 
     public LineCounter(Stream<String> lines) {
         this.lines = lines;

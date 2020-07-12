@@ -26,18 +26,13 @@ public class App {
             return;
         }
 
-        if (file.isDirectory()) {
-            System.out.println("Folder");
-            Directory dir = new Directory();
-            try (Stream<Path> paths = Files.walk(Paths.get(rootPath))) {
-                paths.forEach(dir::addPath);
-            } catch (IOException cause) {
-                cause.printStackTrace();
-            }
-
-            System.out.println("Done");
-        } else if (file.isFile()) {
-            System.out.println("File");
+        Directory dir = new Directory();
+        try (Stream<Path> paths = Files.walk(Paths.get(rootPath))) {
+            paths.forEach(dir::addPath);
+        } catch (IOException cause) {
+            cause.printStackTrace();
         }
+
+        dir.calculateLines();
     }
 }
