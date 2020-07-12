@@ -8,59 +8,60 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class FSNode {
-    private final Path path;
-    private final String name;
-    private final boolean isFile;
-    private final boolean isFolder;
-    private long lines = 0L;
-    private final List<FSNode> children = new ArrayList<>();
 
-    public FSNode(Path path, String name) {
-        this.path = path;
-        this.name = name;
-        this.isFile = Files.isRegularFile(path);
-        this.isFolder = Files.isDirectory(path);
-    }
+  private final Path path;
+  private final String name;
+  private final boolean isFile;
+  private final boolean isFolder;
+  private long lines = 0L;
+  private final List<FSNode> children = new ArrayList<>();
 
-    public FSNode addChild(String name) {
-        Optional<FSNode> node = children.stream()
-            .filter(n -> Objects.equals(n.name, name))
-            .findFirst();
-        if (node.isPresent()) {
-            return node.get();
-        } else {
-            FSNode fsNode = new FSNode(path.resolve(name), name);
-            children.add(fsNode);
-            return fsNode;
-        }
-    }
+  public FSNode(Path path, String name) {
+    this.path = path;
+    this.name = name;
+    this.isFile = Files.isRegularFile(path);
+    this.isFolder = Files.isDirectory(path);
+  }
 
-    public Path getPath() {
-        return path;
+  public FSNode addChild(String name) {
+    Optional<FSNode> node = children.stream()
+        .filter(n -> Objects.equals(n.name, name))
+        .findFirst();
+    if (node.isPresent()) {
+      return node.get();
+    } else {
+      FSNode fsNode = new FSNode(path.resolve(name), name);
+      children.add(fsNode);
+      return fsNode;
     }
+  }
 
-    public String getName() {
-        return name;
-    }
+  public Path getPath() {
+    return path;
+  }
 
-    public long getLines() {
-        return lines;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setLines(long lines) {
-        this.lines = lines;
-    }
+  public long getLines() {
+    return lines;
+  }
 
-    public boolean isFile() {
-        return isFile;
-    }
+  public void setLines(long lines) {
+    this.lines = lines;
+  }
 
-    public boolean isFolder() {
-        return isFolder;
-    }
+  public boolean isFile() {
+    return isFile;
+  }
 
-    // Method is used only in tests && Directory.class
-    List<FSNode> getChildren() {
-        return children;
-    }
+  public boolean isFolder() {
+    return isFolder;
+  }
+
+  // Method is used only in tests && Directory.class
+  List<FSNode> getChildren() {
+    return children;
+  }
 }
