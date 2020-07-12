@@ -3,6 +3,7 @@ package com.codekata.dir;
 import com.codekata.LineCounter;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,8 @@ import java.util.stream.Stream;
  *    * root folder should be the same
  */
 public class Directory {
+    private static final int INDENT = 4;
+    private static final char INDENT_SYMBOL = ' ';
     private FSNode root = null;
 
     public void addPath(Path path) {
@@ -68,5 +71,18 @@ public class Directory {
             node.setLines(size);
         }
         return node.getLines();
+    }
+
+    public void print(PrintStream output) {
+        print(output, root, 0);
+    }
+
+    private void print(PrintStream output, FSNode node, int depth) {
+        String spaces = new String(new char[depth * INDENT]).replace('\0', INDENT_SYMBOL);
+        String row = String.format("%s%s : %d", spaces, node.getName(), node.getLines());
+        output.println(row);
+        for (FSNode child : node.getChildren()) {
+            print(output, child, depth + 1);
+        }
     }
 }

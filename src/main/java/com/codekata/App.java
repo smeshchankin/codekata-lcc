@@ -34,5 +34,6 @@ public class App {
         }
 
         dir.calculateLines();
+        dir.print(System.out);
     }
 }
