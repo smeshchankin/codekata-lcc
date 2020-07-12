@@ -3,7 +3,6 @@ package com.codekata.dir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,9 +23,8 @@ class DirectoryTest {
 
     @Test
     void testAddNullPath() {
-        List<String> paths = Collections.emptyList();
-        Path path = Paths.get(String.join("/", paths));
-        dir.addPath(path);
+        Stream<List<String>> paths = Stream.of(Collections.emptyList());
+        process(paths);
 
         FSNode curr = dir.getRoot();
         assertNull(curr, "Empty path has null root");
@@ -34,9 +32,8 @@ class DirectoryTest {
 
     @Test
     void testAddFileAsPath() {
-        List<String> paths = Collections.singletonList("file.txt");
-        Path path = Paths.get(String.join("/", paths));
-        dir.addPath(path);
+        Stream<List<String>> paths = Stream.of(Collections.singletonList("file.txt"));
+        process(paths);
 
         FSNode root = dir.getRoot();
         testFSNode(root, "file.txt", 0);
@@ -44,9 +41,8 @@ class DirectoryTest {
 
     @Test
     void testAddOnePath() {
-        List<String> paths = Arrays.asList("root", "folder", "file.txt");
-        Path path = Paths.get(String.join("/", paths));
-        dir.addPath(path);
+        Stream<List<String>> paths = Stream.of(Arrays.asList("root", "folder", "file.txt"));
+        process(paths);
 
         FSNode curr = dir.getRoot();
         testFSNode(curr, "root", 1);
@@ -60,26 +56,19 @@ class DirectoryTest {
 
     @Test
     public void testIncorrectRootFolders() {
-        Stream<List<String>> stream = Stream.of(
+        final Stream<List<String>> paths = Stream.of(
             Arrays.asList("root", "file_1.txt"),
             Arrays.asList("folder", "file_2.txt"));
 
-        assertThrows(IllegalArgumentException.class, () ->
-            stream.map(list -> String.join("/", list))
-                .map(Paths::get)
-                .forEach(dir::addPath)
-        );
+        assertThrows(IllegalArgumentException.class, () -> process(paths));
     }
 
     @Test
     public void testOneFolderTwoFiles() {
-        Stream<List<String>> stream = Stream.of(
+        Stream<List<String>> paths = Stream.of(
             Arrays.asList("root", "file_1.txt"),
             Arrays.asList("root", "file_2.txt"));
-
-        stream.map(list -> String.join("/", list))
-            .map(Paths::get)
-            .forEach(dir::addPath);
+        process(paths);
 
         FSNode root = dir.getRoot();
         testFSNode(root, "root", 2);
@@ -89,13 +78,10 @@ class DirectoryTest {
 
     @Test
     public void testSamePathsWithTwoFiles() {
-        Stream<List<String>> stream = Stream.of(
+        Stream<List<String>> paths = Stream.of(
             Arrays.asList("root", "folder", "sub-folder", "file_1.txt"),
             Arrays.asList("root", "folder", "sub-folder", "file_2.txt"));
-
-        stream.map(list -> String.join("/", list))
-            .map(Paths::get)
-            .forEach(dir::addPath);
+        process(paths);
 
         FSNode curr = dir.getRoot();
         testFSNode(curr, "root", 1);
@@ -108,6 +94,13 @@ class DirectoryTest {
 
         testFSNode(curr.getChildren().get(0), "file_1.txt", 0);
         testFSNode(curr.getChildren().get(1), "file_2.txt", 0);
+    }
+
+    private void process(Stream<List<String>> stream) {
+        stream
+            .map(list -> String.join("/", list))
+            .map(Paths::get)
+            .forEach(dir::addPath);
     }
 
     private void testFSNode(FSNode node, String name, int childrenSize) {
