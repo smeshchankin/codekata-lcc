@@ -1,7 +1,43 @@
 package com.codekata;
 
+import com.codekata.dir.Directory;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("Line Code Counter Application: lcc.jar");
+        if (args == null || args.length != 1) {
+            System.err.println("1 parameter is required: file / folder");
+            System.out.println("Line Code Counter Application: lcc.jar");
+            return;
+        }
+
+        String rootPath = args[0];
+
+        File file = new File(rootPath);
+        if (!file.exists()) {
+            System.err.println("File / folder " + rootPath + " doesn't exist");
+            System.out.println("Line Code Counter Application: lcc.jar");
+            return;
+        }
+
+        if (file.isDirectory()) {
+            System.out.println("Folder");
+            Directory dir = new Directory();
+            try (Stream<Path> paths = Files.walk(Paths.get(rootPath))) {
+                paths.forEach(dir::addPath);
+            } catch (IOException cause) {
+                cause.printStackTrace();
+            }
+
+            System.out.println("Done");
+        } else if (file.isFile()) {
+            System.out.println("File");
+        }
     }
 }
