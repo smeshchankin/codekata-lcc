@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DirectoryTest {
     private Directory dir;
@@ -55,6 +56,19 @@ class DirectoryTest {
 
         curr = curr.getChildren().get(0);
         testFSNode(curr, "file.txt", 0);
+    }
+
+    @Test
+    public void testIncorrectRootFolders() {
+        Stream<List<String>> stream = Stream.of(
+            Arrays.asList("root", "file_1.txt"),
+            Arrays.asList("folder", "file_2.txt"));
+
+        assertThrows(IllegalArgumentException.class, () ->
+            stream.map(list -> String.join("/", list))
+                .map(Paths::get)
+                .forEach(dir::addPath)
+        );
     }
 
     @Test
